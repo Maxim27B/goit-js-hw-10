@@ -1,48 +1,41 @@
-const formData = {
-    email: "",
-    message: "",
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+
+const form = document.querySelector('.form');
+const input = document.querySelector('[name="delay"]');
+const radioElem = document.querySelectorAll('[type="radio"]');
+
+function createPromise(delay, status) {
+    const promise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (status) resolve(`✅ Fulfilled promise in ${delay}ms`)
+            else reject(`❌ Rejected promise in ${delay}ms`)
+        }, delay)
+    });
+    promise
+        .then(() => {
+            console.log(`✅ Fulfilled promise in ${delay}ms`);
+            iziToast.show({
+                title: '',
+                message: `Fulfilled promise in ${delay}ms`,
+                position: 'topCenter',
+                backgroundColor: 'green',
+                theme: 'dark',
+                messageColor: 'white',
+            }); })
+        .catch(() => {
+            console.log(`❌ Rejected promise in ${delay}ms`); iziToast.show({
+                title: '',
+                message: `Rejected promise in ${delay}ms`,
+                position: 'topCenter',
+                backgroundColor: 'red',
+                theme: 'dark',
+                messageColor: 'white',
+            }); })
+    
 };
-
-const form = document.querySelector('form');
-form.addEventListener('input', () => {
-    formData.email = form.elements.email.value.trim();
-    formData.message = form.elements.message.value.trim();
-    saveToLS('feedback-form-state', formData)
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-    const info = loadFromLS('feedback-form-state');
-    if (info !== null) {
-        form.elements.email.value = info.email;
-    form.elements.message.value = info.message;
-    formData.email = info.email;
-    formData.message = info.message;
-    }
-})
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (formData.email === '' ||
-        formData.message === '') {
-        alert('Fill please all fields');
-    } else {
-        console.log(formData)
-        localStorage.removeItem('feedback-form-state');
-        form.reset();
-    }
-})
-
-function saveToLS(key, value) {
-    const json = JSON.stringify(value);
-    localStorage.setItem(key, json);
-}
-
-function loadFromLS(key) {
-    const json = localStorage.getItem(key);
-    try {
-        const data = JSON.parse(json);
-        return data;
-    } catch {
-        return json;
-    }
-}
+    const status = e.target.state.value;
+    createPromise(input.value, status === 'fulfilled')})
